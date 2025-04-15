@@ -1,0 +1,79 @@
+.action-btn {
+  background-color: transparent;
+  border: none;
+  color: #8899a6;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 50px;
+  padding: 6px 15px;
+}
+.action-btn:hover {
+  background-color: #22303c;
+  color: #1da1f2;
+}
+
+body {
+      background-color: #15202b;
+      color: #e1e8ed;
+}
+
+a {
+  color: #1da1f2;
+}
+.sidebar-link:hover {
+  background-color: #22303c;
+  border-radius: 25px;
+}
+.tweet-box, .tweet, .right-sidebar {
+  background-color: #192734;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid #253341;
+}
+.nav-link {
+  color: #e1e8ed !important;
+}
+.btn-primary {
+  background-color: #1da1f2;
+  border-color: #1da1f2;
+}
+.btn-outline-primary {
+  border-color: #1da1f2;
+  color: #1da1f2;
+}
+.btn-outline-primary:hover {
+  background-color: #1da1f2;
+  color: white;
+}
+
+.custom-flash {
+  background-color: #22303c;
+  border: 1px solid #38444d;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+  animation: slideFade 0.5s ease-in-out;
+}
+
+.alert-success {
+  border-left: 5px solid #28a745;
+}
+.alert-danger, .alert-error {
+  border-left: 5px solid #dc3545;
+}
+.alert-info {
+  border-left: 5px solid #17a2b8;
+}
+.alert-warning {
+  border-left: 5px solid #ffc107;
+}
+
+@keyframes slideFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
