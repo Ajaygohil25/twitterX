@@ -35,7 +35,7 @@ def profile(request):
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
 
-    posts = Post.objects.filter(user_id=request.user).all()
+    posts = Post.objects.filter(user_id=request.user).order_by('-created_at').all()
     context = {
         'u_form': u_form,
         'p_form': p_form,

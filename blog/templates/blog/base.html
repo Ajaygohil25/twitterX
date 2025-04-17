@@ -14,13 +14,14 @@
       <div class="row">
 
         <!-- Left Sidebar -->
-        <div class="col-md-3 d-none d-md-block">
+       <div class="sidebar text-light p-3"
+            style="position: fixed; top: 0; left: 0; height: 100vh; width: 300px; overflow: hidden;">
           {% include 'blog/_left_sidebar.html' %}
         </div>
 
         <!-- Main Feed -->
-        <div class="col-md-6 min-vh-100">
-            <div class="container mt-3">
+        <div class="content-area col-md-6 min-vh-100" style="margin-left: 350px;">
+            <div class="container mt-2">
               {% if messages %}
                 {% for message in messages %}
                   <div class="alert alert-{{ message.tags }} alert-dismissible fade show custom-flash" role="alert">

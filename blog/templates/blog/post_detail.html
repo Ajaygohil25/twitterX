@@ -1,0 +1,124 @@
+{% extends 'blog/base.html' %}
+{% block content %}
+
+
+<div class="card bg-dark text-light mb-4 shadow-sm border-0 rounded">
+  <div class="card-body">
+
+<!-- Profile Info -->
+<div class="d-flex align-items-center mb-2">
+<!-- Profile Image -->
+  <img src="{{ object.user_id.profile.image.url|default:'https://via.placeholder.com/50?text=U' }}"
+       alt="Profile"
+       class="rounded-circle mr-3 border border-secondary"
+       width="50" height="50">
+
+  <!-- User Info + Date + 3-dot menu -->
+  <div class="w-100">
+    <div class="d-flex justify-content-between align-items-center">
+      <!-- Name & Username -->
+      <div>
+        <strong>{{ object.user_id.first_name }} {{ object.user_id.last_name }}</strong>
+        <span class="text-muted ml-1">@{{ object.user_id.username }}</span>
+      </div>
+
+      <!-- Date + Dropdown -->
+      <div class="d-flex align-items-center">
+        <small class="text-muted mr-2">{{ object.created_at|date:"M d, Y" }}</small>
+
+          {% if object.user_id == user %}
+            <!-- 3 Dot Dropdown -->
+            <div class="dropdown">
+              <button class="btn btn-sm text-light p-0 border-0 bg-transparent" type="button" id="postDropdown{{ object.id }}"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="bi bi-three-dots-vertical" style="font-size: 1.2rem;"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right bg-dark text-light shadow-sm" aria-labelledby="postDropdown{{ object.id }}">
+                <a class="dropdown-item text-light" href="{% url 'blog-update' object.id %}">
+                  <i class="bi bi-pencil-square mr-2"></i> Update Post
+                </a>
+                <form method="POST" action="{% url 'blog-delete' object.id %}" class="m-0 p-0">
+                  {% csrf_token %}
+                  <button type="submit" class="dropdown-item text-light" style="background: none; border: none;">
+                    <i class="bi bi-trash mr-2"></i> Delete Post
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+    <!-- Post Content -->
+    <div class="mt-3 mb-3" style="font-size: 1.2rem;">
+      <a href="{% url 'blog-detail' object.id %}" class="text-light text-decoration-none">
+        {{ object.content }}
+      </a>
+    </div>
+
+    <!-- Media (centered, no bottom border) -->
+      {% if object.media_set.all %}
+  <!-- Bootstrap Carousel -->
+  <div id="carouselPost{{ object.id }}" class="carousel slide mb-3" data-ride="carousel">
+    <div class="carousel-inner rounded overflow-hidden">
+      {% for media in object.media_set.all %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <img src="{{ media.file_url|default_if_none:'#' }}"
+               class="d-block w-100"
+               style="max-height: 400px; object-fit: cover; cursor: zoom-in;"
+               data-toggle="modal"
+               data-target="#imageModal{{ object.id }}{{ forloop.counter }}">
+        </div>
+      {% endfor %}
+    </div>
+
+    {% if object.media_set.all|length > 1 %}
+      <a class="carousel-control-prev" href="#carouselPost{{ object.id }}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselPost{{ object.id }}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Image Modals -->
+  {% for media in object.media_set.all %}
+    <div class="modal fade" id="imageModal{{ object.id }}{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content bg-dark border-0">
+          <div class="modal-body p-0">
+            <img src="{{ media.file_url|default_if_none:'#' }}"
+                 class="img-fluid w-100"
+                 style="object-fit: contain;">
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+{% endif %}
+
+
+
+    <!-- Buttons: No border, cleaner spacing -->
+    <div class="d-flex justify-content-around mt-3">
+      <button class="btn btn-sm text-light p-2">
+        <i class="bi bi-heart mr-1"></i> Like
+      </button>
+      <button class="btn btn-sm text-light p-2">
+        <i class="bi bi-chat mr-1"></i> Comment
+      </button>
+      <button class="btn btn-sm text-light p-2">
+        <i class="bi bi-arrow-repeat mr-1"></i> Repost
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
