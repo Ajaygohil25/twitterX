@@ -1,14 +1,13 @@
-from datetime import datetime
-from django.http import HttpResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
 from blog.form import MediaForm
 from blog.models import Post, Media
 
 
 def home(request):
-    posts  = Post.objects.all()
+    posts = Post.objects.all()
     contexts = {
         "posts": posts,
     }
@@ -53,6 +52,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
         return response
 
+
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     template_name = "blog/post_form.html"
@@ -64,6 +64,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.request.user != post.user_id:
             return False
         return True
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -91,6 +92,7 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = '/'
+
     def test_func(self):
         post = self.get_object()
 

@@ -1,122 +1,152 @@
-
 {% for post in posts %}
-<div class="card bg-dark text-light mb-4 shadow-sm border-0 rounded">
-  <div class="card-body">
+    <div class="card bg-dark text-light mb-4 shadow-sm border-0 rounded">
+        <div class="card-body">
 
-<!-- Profile Info -->
-<div class="d-flex align-items-center mb-2">
-<!-- Profile Image -->
-  <img src="{{ post.user_id.profile.image.url|default:'https://via.placeholder.com/50?text=U' }}"
-       alt="Profile"
-       class="rounded-circle mr-3 border border-secondary"
-       width="50" height="50">
+            <!-- Profile Info -->
+            <div class="d-flex align-items-center mb-2">
+                <!-- Profile Image -->
+                <img src="{{ post.user_id.profile.image.url|default:'https://via.placeholder.com/50?text=U' }}"
+                     alt="Profile"
+                     class="rounded-circle mr-3 border border-secondary"
+                     width="50" height="50">
 
-  <!-- User Info + Date + 3-dot menu -->
-  <div class="w-100">
-    <div class="d-flex justify-content-between align-items-center">
-      <!-- Name & Username -->
-      <div>
-        <strong>{{ post.user_id.first_name }} {{ post.user_id.last_name }}</strong>
-        <span class="text-muted ml-1">@{{ post.user_id.username }}</span>
-      </div>
+                <!-- User Info + Date + 3-dot menu -->
+                <div class="w-100">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Name & Username -->
+                        <div>
+                            <strong>{{ post.user_id.first_name }} {{ post.user_id.last_name }}</strong>
+                            <span class="text-muted ml-1">@{{ post.user_id.username }}</span>
+                        </div>
 
-      <!-- Date + Dropdown -->
-      <div class="d-flex align-items-center">
-        <small class="text-muted mr-2">{{ post.created_at|date:"M d, Y" }}</small>
+                        <!-- Date + Dropdown -->
+                        <div class="d-flex align-items-center">
+                            <small class="text-muted mr-2">{{ post.created_at|date:"M d, Y" }}</small>
 
-          {% if post.user_id == user %}
-            <!-- 3 Dot Dropdown -->
-            <div class="dropdown">
-              <button class="btn btn-sm text-light p-0 border-0 bg-transparent" type="button" id="postDropdown{{ post.id }}"
-                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="bi bi-three-dots-vertical" style="font-size: 1.2rem;"></i>
-              </button>
-              <div class="dropdown-menu dropdown-menu-right bg-dark text-light shadow-sm" aria-labelledby="postDropdown{{ post.id }}">
-                <a class="dropdown-item text-light" href="{% url 'blog-update' post.id %}">
-                  <i class="bi bi-pencil-square mr-2"></i> Update Post
-                </a>
-                <form method="POST" action="{% url 'blog-delete' post.id %}" class="m-0 p-0">
-                  {% csrf_token %}
-                  <button type="submit" class="dropdown-item text-light" style="background: none; border: none;">
-                    <i class="bi bi-trash mr-2"></i> Delete Post
-                  </button>
-                </form>
-              </div>
+                            {% if post.user_id == user %}
+                                <!-- 3 Dot Dropdown -->
+                                <div class="dropdown">
+                                    <button class="btn btn-sm text-light p-0 border-0 bg-transparent" type="button"
+                                            id="postDropdown{{ post.id }}"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical" style="font-size: 1.2rem;"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-right bg-dark text-light shadow-sm"
+                                         aria-labelledby="postDropdown{{ post.id }}">
+                                        <a class="dropdown-item text-light" href="{% url 'blog-update' post.id %}">
+                                            <i class="bi bi-pencil-square mr-2"></i> Update Post
+                                        </a>
+                                        <form method="POST" action="{% url 'blog-delete' post.id %}" class="m-0 p-0">
+                                            {% csrf_token %}
+                                            <button type="submit" class="dropdown-item text-light"
+                                                    style="background: none; border: none;">
+                                                <i class="bi bi-trash mr-2"></i> Delete Post
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+                    </div>
+                </div>
             </div>
 
-          {% endif %}
 
-      </div>
-    </div>
-  </div>
-</div>
+            <!-- Post Content -->
+            <div class="mt-3 mb-3" style="font-size: 1.2rem;">
+                <a href="{% url 'blog-detail' post.id %}" class="text-light text-decoration-none">
+                    {{ post.content }}
+                </a>
+            </div>
 
+            <!-- Media (centered, no bottom border) -->
+            {% if post.media_set.all %}
+                <!-- Bootstrap Carousel -->
+                <div id="carouselPost{{ post.id }}" class="carousel slide mb-3" data-ride="carousel">
+                    <div class="carousel-inner rounded overflow-hidden">
+                        {% for media in post.media_set.all %}
+                            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                                <img src="{{ media.file_url|default_if_none:'#' }}"
+                                     class="d-block w-100"
+                                     style="max-height: 400px; object-fit: cover; cursor: zoom-in;"
+                                     data-toggle="modal"
+                                     data-target="#imageModal{{ post.id }}{{ forloop.counter }}">
+                            </div>
+                        {% endfor %}
+                    </div>
 
-    <!-- Post Content -->
-    <div class="mt-3 mb-3" style="font-size: 1.2rem;">
-      <a href="{% url 'blog-detail' post.id %}" class="text-light text-decoration-none">
-        {{ post.content }}
-      </a>
-    </div>
+                    {% if post.media_set.all|length > 1 %}
+                        <a class="carousel-control-prev" href="#carouselPost{{ post.id }}" role="button"
+                           data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselPost{{ post.id }}" role="button"
+                           data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    {% endif %}
+                </div>
 
-    <!-- Media (centered, no bottom border) -->
-      {% if post.media_set.all %}
-  <!-- Bootstrap Carousel -->
-  <div id="carouselPost{{ post.id }}" class="carousel slide mb-3" data-ride="carousel">
-    <div class="carousel-inner rounded overflow-hidden">
-      {% for media in post.media_set.all %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <img src="{{ media.file_url|default_if_none:'#' }}"
-               class="d-block w-100"
-               style="max-height: 400px; object-fit: cover; cursor: zoom-in;"
-               data-toggle="modal"
-               data-target="#imageModal{{ post.id }}{{ forloop.counter }}">
+                <!-- Image Modals -->
+                {% for media in post.media_set.all %}
+                    <div class="modal fade" id="imageModal{{ post.id }}{{ forloop.counter }}" tabindex="-1"
+                         role="dialog" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                            <div class="modal-content bg-dark border-0">
+                                <div class="modal-body p-0">
+                                    <img src="{{ media.file_url|default_if_none:'#' }}"
+                                         class="img-fluid w-100"
+                                         style="object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- Buttons: No border, cleaner spacing -->
+            <div class="d-flex justify-content-around mt-3">
+                <button class="btn btn-sm text-light p-2">
+                    <i class="bi bi-heart mr-1"></i> Like
+                </button>
+                <button class="btn btn-sm text-light p-2">
+                    <i class="bi bi-chat mr-1"></i> Comment
+                </button>
+                <button class="btn btn-sm text-light p-2">
+                    <i class="bi bi-arrow-repeat mr-1"></i> Repost
+                </button>
+            </div>
         </div>
-      {% endfor %}
     </div>
-
-    {% if post.media_set.all|length > 1 %}
-      <a class="carousel-control-prev" href="#carouselPost{{ post.id }}" role="button" data-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#carouselPost{{ post.id }}" role="button" data-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
-    {% endif %}
-  </div>
-
-  <!-- Image Modals -->
-  {% for media in post.media_set.all %}
-    <div class="modal fade" id="imageModal{{ post.id }}{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content bg-dark border-0">
-          <div class="modal-body p-0">
-            <img src="{{ media.file_url|default_if_none:'#' }}"
-                 class="img-fluid w-100"
-                 style="object-fit: contain;">
-          </div>
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-{% endif %}
-
-
-
-    <!-- Buttons: No border, cleaner spacing -->
-    <div class="d-flex justify-content-around mt-3">
-      <button class="btn btn-sm text-light p-2">
-        <i class="bi bi-heart mr-1"></i> Like
-      </button>
-      <button class="btn btn-sm text-light p-2">
-        <i class="bi bi-chat mr-1"></i> Comment
-      </button>
-      <button class="btn btn-sm text-light p-2">
-        <i class="bi bi-arrow-repeat mr-1"></i> Repost
-      </button>
-    </div>
-  </div>
-</div>
 {% endfor %}
+
+<div class="container text-center mt-4">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+            <a class="btn-outline-primary" href="?page={{ page_obj.previous_page_number }}">
+                <button> previous</button>
+            </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <a class="btn-outline-primary" href="?page={{ num }}">
+                    <button> {{ num }} </button>
+                </a>
+            {% elif num > page_obj.number|add:'-2' and num < page_obj.number|add:'2' %}
+                <a class="btn-outline-primary" href="?page={{ num }}">
+                    <button> {{ num }} </button>
+                </a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <a class="btn-outline-primary" href="?page={{ page_obj.next_page_number }}">
+                <button> Next</button>
+            </a>
+        {% endif %}
+    {% endif %}
+</div>
