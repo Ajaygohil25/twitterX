@@ -1,58 +1,5 @@
 {% extends 'blog/base.html' %}
 {% block content %}
 
-<!-- Tweet Composer -->
-<div class="tweet-box">
-  <form method="POST">
-    {% csrf_token %}
-    <div class="form-group">
-      <textarea class="form-control bg-dark text-light" rows="3" placeholder="What's happening?"></textarea>
-    </div>
-    <div class="text-right">
-      <button class="btn btn-primary rounded-pill">Post</button>
-    </div>
-  </form>
-</div>
-
-{% for post in posts %}
-<div class="tweet card text-light p-3 mb-4 border-secondary">
-  <div class="d-flex align-items-start">
-    <!-- Profile Image -->
-    <img src="{{ post.user_id.profile.image.url|default:'https://via.placeholder.com/50?text=U' }}"
-         alt="Profile Picture"
-         class="rounded-circle mr-3"
-         width="50" height="50">
-
-    <!-- User Info + Date -->
-    <div class="flex-grow-1">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <strong>{{ post.user_id.first_name }} {{ post.user_id.last_name }}</strong>
-          <span class="text-muted ml-1">@{{ post.user_id.username }}</span>
-        </div>
-        <small class="text-muted">{{ post.created_at|date:"M d, Y" }}</small>
-      </div>
-
-      <!-- Post Content -->
-      <div class="mt-2">
-        <p class="mb-2" style="font-size: 1.1rem;">{{ post.content }}</p>
-      </div>
-
-      <!-- Buttons -->
-      <div class="d-flex justify-content-around mt-3">
-        <button class="btn btn-dark btn-sm action-btn">
-          <i class="bi bi-heart"></i> Like
-        </button>
-        <button class="btn btn-dark btn-sm action-btn">
-          <i class="bi bi-chat"></i> Comment
-        </button>
-        <button class="btn btn-dark btn-sm action-btn">
-          <i class="bi bi-arrow-repeat"></i> Repost
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endfor %}
-
+{% include 'blog/show_posts_feed.html' %}
 {% endblock %}
