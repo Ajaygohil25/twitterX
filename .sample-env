@@ -1,0 +1,12 @@
+DATABASE_NAME = <database name>
+DATABASE_USERNAME = <database username>
+DATABASE_PASSWORD = <database password>
+DATABASE_HOST = <database host>
+DATABASE_PORT = <port number>
+POSTGRES_DB = <database provider name>
+
+MAIL_USERNAME = <mail user name>
+MAIL_PASSWORD = <mail password>
+MAIL_PORT = <mail port>
+MAIL_SERVER = <mail server>
+MAIL_FROM =  <mail sending user>

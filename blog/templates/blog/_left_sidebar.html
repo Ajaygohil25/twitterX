@@ -50,8 +50,8 @@
                 <strong>@{{ user.username }}</strong>
             </a>
             <div class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownUser">
-                <a class="dropdown-item" href="#">
-                    <i class="bi bi-pencil-square mr-2"></i> Update Profile
+                <a class="dropdown-item" href="{% url 'password_change' %}">
+                    <i class="bi bi-pencil-square mr-2"></i> Update Password
                 </a>
                 <form action="{% url 'user-logout' %}" method="post" class="m-0 p-0">
                     {% csrf_token %}
