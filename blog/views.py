@@ -1,9 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from blog.form import MediaForm
-from blog.models import Post, Media
+from blog.models import Post, Media, Like
 
 
 def home(request):
@@ -19,6 +20,12 @@ class PostListView(LoginRequiredMixin, ListView):
     template_name = 'blog/home.html'
     ordering = ['-created_at']
     paginate_by = 3
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_likes =  Like.objects.filter(user = self.request.user).values_list('post_id', flat=True)
+        context['liked_posts'] = user_likes
+        return context
 
 class PostDetailView(DetailView):
     model = Post
@@ -100,5 +107,15 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return False
         return True
 
+class PostLikeView(View):
+    def post(self, request, *args, **kwargs):
+        post = get_object_or_404(Post, id=kwargs["pk"])
+        liked = Like.objects.filter(user=request.user, post=post).first()
+        if liked:
+            liked.delete() # unlike the post if instance exists in database
+        else:
+            like = Like(user=request.user, post=post, created_by=request.user)
+            like.save()
+        return redirect('blog-home')
 def about(request):
     return render(request, 'blog/about.html', {"title": "About"})

@@ -107,11 +107,21 @@
                     </div>
                 {% endfor %}
             {% endif %}
-            <!-- Buttons: No border, cleaner spacing -->
+            <!-- Like and Comment Buttons-->
             <div class="d-flex justify-content-around mt-3">
-                <button class="btn btn-sm text-light p-2">
-                    <i class="bi bi-heart mr-1"></i> Like
-                </button>
+                <form method="POST" action="{% url 'blog-like' post.id %}" class="m-0 p-0">
+                    {% csrf_token %}
+                    {% if post.id in liked_posts %}
+                      <button type="submit" class="btn btn-sm text-info p-2">
+                        <i class="bi bi-heart-fill mr-1"></i> Liked
+                      </button>
+                    {% else %}
+                      <button type="submit" class="btn btn-sm text-light p-2">
+                        <i class="bi bi-heart mr-1"></i> Like
+                      </button>
+                    {% endif %}
+                </form>
+
                 <button class="btn btn-sm text-light p-2">
                     <i class="bi bi-chat mr-1"></i> Comment
                 </button>
