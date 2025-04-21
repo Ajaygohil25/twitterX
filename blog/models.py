@@ -33,6 +33,15 @@ class Post(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('user-profile')
 
+    def get_like_count(self):
+        return self.like_set.count()
+
+    def get_comment_count(self):
+        return self.comment_set.count()
+
+    def get_all_comments(self):
+        return self.comment_set.all()
+
 class Media(models.Model):
     file = models.FileField(upload_to="blog_media/", blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

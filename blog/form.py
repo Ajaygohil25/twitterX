@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import ClearableFileInput
 
-from blog.models import Media
+from blog.models import Media, Comment
 
 
 class MediaForm(forms.ModelForm):
@@ -16,3 +16,11 @@ class MediaForm(forms.ModelForm):
         widgets = {
             'file': forms.ClearableFileInput(attrs={'allow_multiple_selected': True}),
         }
+
+
+class CommentForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea, max_length=50)
+
+    class Meta:
+        model = Comment
+        fields = ['comment']
