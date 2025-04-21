@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -8,8 +6,16 @@ from django.urls import reverse
 class TimeStampedModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(blank=True, null=True)
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_by')
-    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='updated_by', blank=True, null=True)
+
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='%(class)s_created_by'  # dynamic: will be like 'comment_created_by'
+    )
+    updated_by = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='%(class)s_updated_by',
+        blank=True, null=True
+    )
 
     class Meta:
         abstract = True
@@ -27,6 +33,15 @@ class Post(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('user-profile')
 
+    def get_like_count(self):
+        return self.like_set.count()
+
+    def get_comment_count(self):
+        return self.comment_set.count()
+
+    def get_all_comments(self):
+        return self.comment_set.all()
+
 class Media(models.Model):
     file = models.FileField(upload_to="blog_media/", blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -35,4 +50,16 @@ class Media(models.Model):
     def file_url(self):
         if self.file:
             return self.file.url
+        return None
 
+class Like(TimeStampedModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='liked_by')
+
+class Comment(TimeStampedModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment = models.TextField(blank=False, null=False)
+    commented_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    reply = models.TextField(blank=True, null=True)
+    replied_by = models.ForeignKey(User, on_delete=models.CASCADE,
+                                   related_name='replies', blank=True, null=True)

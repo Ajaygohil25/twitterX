@@ -1,0 +1,16 @@
+<form hx-post="{% url 'blog-like' post.id %}" class="m-0 p-0 d-flex align-items-center gap-2">
+    {% csrf_token %}
+    {% if is_liked %}
+        <button type="submit" class="btn btn-sm text-info p-2 d-flex align-items-center">
+            <i class="bi bi-heart-fill mr-1"></i> Liked
+        </button>
+    {% else %}
+        <button type="submit" class="btn btn-sm text-light p-2 d-flex align-items-center">
+            <i class="bi bi-heart mr-1"></i> Like
+        </button>
+    {% endif %}
+
+    <span class="ml-2 text" style="font-size: 0.9rem;">
+    {{ post.get_like_count }}
+  </span>
+</form>

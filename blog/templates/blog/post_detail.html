@@ -1,10 +1,10 @@
 {% extends 'blog/base.html' %}
+{% load crispy_forms_filters %}
 {% block content %}
 
 
     <div class="card bg-dark text-light mb-4 shadow-sm border-0 rounded">
         <div class="card-body">
-
             <!-- Profile Info -->
             <div class="d-flex align-items-center mb-2">
                 <!-- Profile Image -->
@@ -111,20 +111,105 @@
                 {% endfor %}
             {% endif %}
 
-
-
             <!-- Buttons: No border, cleaner spacing -->
             <div class="d-flex justify-content-around mt-3">
-                <button class="btn btn-sm text-light p-2">
-                    <i class="bi bi-heart mr-1"></i> Like
-                </button>
-                <button class="btn btn-sm text-light p-2">
-                    <i class="bi bi-chat mr-1"></i> Comment
-                </button>
+                <div id="like-button-{{ post.id }}" hx-swap="outerHTML">
+                    {% if post.id in liked_posts %}
+                        {% include "partials/like_button.html" with post=post is_liked=True  total_likes=total_likes %}
+                    {% else %}
+                        {% include "partials/like_button.html" with post=post is_liked=False total_likes=total_likes %}
+                    {% endif %}
+                </div>
+
+                <div id="comment-section-{{ post.id }}" hx-swap="outerHTML">
+                    {% include "partials/comment_button.html" with post=post comment_form=comment_form %}
+                </div>
                 <button class="btn btn-sm text-light p-2">
                     <i class="bi bi-arrow-repeat mr-1"></i> Repost
                 </button>
             </div>
+
+            {% for comment in post.get_all_comments %}
+                <div class="comment bg-dark text-light p-3 rounded mb-3 border border-secondary">
+
+                    <!-- Header Row: Profile Image, Username, 3-dot menu -->
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+
+                        <!-- Left: Profile Image + Name -->
+                        <div class="d-flex align-items-center">
+                            <img src="{{ comment.commented_by.profile.image.url }}"
+                                 alt="Profile Picture"
+                                 class="rounded-circle mr-2 border border-secondary"
+                                 width="40" height="40">
+
+                            <div>
+                                <strong class="d-block">{{ comment.commented_by.get_full_name }}</strong>
+                                <small class="text-muted">@{{ comment.commented_by.username }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Right: 3-dot dropdown menu -->
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-light rounded-circle" type="button"
+                                    data-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-right dropdown-menu-dark">
+
+                                <button type="button" class="dropdown-item text" data-toggle="modal"
+                                        data-target="#updateCommentModal{{ comment.id }}"  style="background: none; border: none;">
+                                    <i class="bi bi-trash mr-2"></i> Update comment
+                                </button>
+
+                                <form method="POST" action="{% url 'blog-comment-delete' comment.id %}" class="m-0 p-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger"
+                                            style="background: none; border: none;">
+                                        <i class="bi bi-trash mr-2"></i> Delete Comment
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+
+                        <!-- update comment Modal -->
+                        <div class="modal fade" id="updateCommentModal{{ comment.id }}" tabindex="-1" role="dialog"
+                             aria-labelledby="updateProfileModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content bg-dark text-light">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="updateProfileModalLabel">Update Profile</h5>
+                                        <button type="button" class="close text-light" data-dismiss="modal"
+                                                aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" enctype="multipart/form-data"
+                                              action="{% url 'blog-comment-update' comment.id%}">
+                                            {% csrf_token %}
+                                            {{ comment_form|crispy }}
+                                            <button type="submit" class="btn btn-light rounded-pill">Save Changes
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Comment Text -->
+                    <p class="mb-2">{{ comment.comment }}</p>
+
+                    <!-- Reply Button -->
+                    <button class="btn btn-sm btn-outline-info rounded-pill">
+                        <i class="bi bi-reply-fill mr-1"></i> Reply
+                    </button>
+
+                </div>
+            {% endfor %}
+
         </div>
     </div>
 {% endblock %}
