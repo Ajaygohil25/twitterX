@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from blog.models import TimeStampedModel
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -8,3 +9,7 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+class Following(TimeStampedModel):
+    follower_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following')  # the one who follows others
+    following_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followers')  # the one being followed
