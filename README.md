@@ -1,2 +1,2 @@
 # twitterX
-TwitterX is a Django project for learning.
+TwitterX is a clone of Twitter, developed in Django.
