@@ -63,6 +63,11 @@ class Comment(TimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     comment = models.TextField(blank=False, null=False)
     commented_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
-    reply = models.TextField(blank=True, null=True)
-    replied_by = models.ForeignKey(User, on_delete=models.CASCADE,
-                                   related_name='replies', blank=True, null=True)
+
+    def get_all_replies(self):
+        return self.reply_set.all()
+
+class Reply(TimeStampedModel):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    reply = models.TextField(blank=False, null=False)
+    replied_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='replied_by')
