@@ -9,7 +9,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
 from blog.form import MediaForm, CommentForm, ReplyForm
-from blog.models import Post, Media, Like, Comment
+from blog.models import Post, Media, Like, Comment, Reply
 from users.models import Following
 
 
@@ -85,7 +85,6 @@ class PostDetailView(DetailView):
             context["reply_form"] = ReplyForm(self.request.POST)
         else:
             context['comment_form'] = CommentForm()
-            context["all_comments"] = post.comment_set.all()
             context["reply_form"] = ReplyForm(self.request.POST)
 
         return context
@@ -249,9 +248,9 @@ class CommentReplyView(LoginRequiredMixin, View):
         reply_text = request.POST.get('reply')
 
         if reply_text:
-            comment.reply = reply_text
-            comment.replied_by = request.user
-            comment.save()
+            reply = Reply(comment=comment, reply=reply_text,
+                          replied_by=request.user, created_by=request.user)
+            reply.save()
             messages.success(request, f'Replied successfully!')
 
         html = render_to_string("partials/reply_button.html",

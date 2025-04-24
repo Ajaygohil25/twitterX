@@ -1,7 +1,7 @@
 from django import forms
 from django.forms.widgets import ClearableFileInput
 
-from blog.models import Media, Comment
+from blog.models import Media, Comment, Reply
 
 
 class MediaForm(forms.ModelForm):
@@ -29,5 +29,5 @@ class ReplyForm(forms.Form):
     reply = forms.CharField(widget=forms.Textarea, max_length=50)
 
     class Meta:
-        model = Comment
+        model = Reply
         fields = ['reply']
