@@ -202,10 +202,10 @@
                     <!-- Comment Text -->
                     <p class="mb-2">{{ comment.comment }}</p>
 
-                    <!-- Reply Button -->
-                    <button class="btn btn-sm btn-outline-info rounded-pill">
-                        <i class="bi bi-reply-fill mr-1"></i> Reply
-                    </button>
+                    <div id="comment-section-{{ comment.id }}" hx-swap="outerHTML">
+                        {% include "partials/reply_button.html" with comment=comment reply_form=reply_form %}
+                    </div>
+
 
                 </div>
             {% endfor %}
