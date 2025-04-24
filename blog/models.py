@@ -42,6 +42,9 @@ class Post(TimeStampedModel):
     def get_all_comments(self):
         return self.comment_set.all()
 
+    def get_queryset(self):
+        return Post.objects.filter(user_id=self.user_id).order_by('-created_at').all()
+
 class Media(models.Model):
     file = models.FileField(upload_to="blog_media/", blank=True, null=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

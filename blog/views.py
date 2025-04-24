@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.defaulttags import comment
@@ -9,14 +10,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 
 from blog.form import MediaForm, CommentForm
 from blog.models import Post, Media, Like, Comment
+from users.models import Following
 
-
-def home(request):
-    posts = Post.objects.all()
-    contexts = {
-        "posts": posts,
-    }
-    return render(request, 'blog/home.html', context=contexts)
 
 class PostListView(LoginRequiredMixin, ListView):
     model = Post
@@ -30,11 +25,50 @@ class PostListView(LoginRequiredMixin, ListView):
         user_likes =  Like.objects.filter(user = self.request.user).values_list('post_id', flat=True)
         context['liked_posts'] = user_likes
 
+        context["following_users"] = (Following.objects.filter(follower_user=self.request.user).
+                                      values_list('following_user_id',flat=True))
+
+        context["login_user"] = self.request.user
+        # breakpoint()
         if self.request.POST:
             context['comment_form'] = CommentForm(self.request.POST)
         else:
             context['comment_form'] = CommentForm()
 
+        return context
+
+
+class FollowingUserListView(LoginRequiredMixin, ListView):
+    model = Post
+    context_object_name = 'posts'
+    template_name = "blog/home.html"
+    paginate_by = 3
+
+    def get_queryset(self):
+        following_users = Following.objects.filter(
+            follower_user=self.request.user
+        ).values_list('following_user', flat=True)
+
+        posts = Post.objects.filter(user_id__in=following_users).order_by('-created_at')
+        return posts
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["login_user"] = self.request.user
+
+        user_likes = Like.objects.filter(user=self.request.user).values_list('post_id', flat=True)
+        context['liked_posts'] = user_likes
+
+        context["following_users"] = Following.objects.filter(
+            follower_user=self.request.user
+        ).values_list('following_user', flat=True)
+
+        # Comment form
+        if self.request.POST:
+            context['comment_form'] = CommentForm(self.request.POST)
+        else:
+            context['comment_form'] = CommentForm()
         return context
 
 class PostDetailView(DetailView):

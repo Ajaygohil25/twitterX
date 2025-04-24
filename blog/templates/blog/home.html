@@ -1,5 +1,18 @@
 {% extends 'blog/base.html' %}
 {% block content %}
 
-{% include 'blog/show_posts_feed.html' %}
+    <!-- Tabs Navigation -->
+    <div class="d-flex justify-content-center mb-4">
+        <a href="{% url 'blog-home' %}"
+           class="btn btn-outline-light mx-2 {% if request.resolver_match.url_name == 'blog-home' %}active-tab{% endif %}">
+            <i class="bi bi-house-door-fill mr-1"></i> Feed
+        </a>
+        <a href="{% url 'following-feed' %}"
+           class="btn btn-outline-light mx-2 {% if request.resolver_match.url_name == 'following-feed' %}active-tab{% endif %}">
+            <i class="bi bi-people-fill mr-1"></i> Following
+        </a>
+
+    </div>
+
+    {% include 'blog/show_posts_feed.html' %}
 {% endblock %}

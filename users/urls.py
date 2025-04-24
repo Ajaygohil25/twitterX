@@ -1,6 +1,6 @@
 from django.urls import path
 
-from users.views import register, ProfileDetailView
+from users.views import register, ProfileDetailView, ProfileFollowView
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -31,5 +31,6 @@ urlpatterns = [
             auth_views.PasswordChangeDoneView.as_view(template_name='users/password_change_done.html'),
             name="password_change_done"),
 
-       path("profile", ProfileDetailView.as_view(), name="user-profile")
+       path("profile", ProfileDetailView.as_view(), name="user-profile"),
+       path("follow", ProfileFollowView.as_view(), name="user-follow"),
 ]

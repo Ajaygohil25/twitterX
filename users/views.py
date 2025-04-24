@@ -1,10 +1,15 @@
+from datetime import datetime
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.views import View
 from django.views.generic import FormView
 from blog.models import Post
 from users.form import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from users.models import Following
+
 
 def register(request):
     if request.method == 'POST':
@@ -30,7 +35,8 @@ class ProfileDetailView(LoginRequiredMixin, FormView):
         user_form = UserUpdateForm(instance=request.user)
         post_form = ProfileUpdateForm(instance=request.user.profile)
         posts = Post.objects.filter(user_id=self.request.user).order_by('-created_at').all()
-        return self.render_to_response({"user_form": user_form, "post_form": post_form, "posts": posts})
+        return self.render_to_response({"user_form": user_form, "post_form": post_form, "posts": posts,
+                                        "login_user": self.request.user})
 
     def post(self, request, *args, **kwargs):
         user_form = UserUpdateForm(request.POST, instance=request.user)
@@ -45,3 +51,26 @@ class ProfileDetailView(LoginRequiredMixin, FormView):
             messages.error(request, f'Error updating your account!')
             return redirect('user-profile')
 
+
+class ProfileFollowView(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        following_user = User.objects.get(id=request.POST.get('user_id'))
+        login_user = request.user
+
+        is_following = Following.objects.filter(
+            follower_user_id=login_user.id,
+            following_user_id=following_user.id
+        ).first()
+
+        # if user already following then unfollow
+        if is_following:
+            Following.delete(is_following)
+            messages.success(request, f'You are no longer following {following_user.username}!')
+        else:
+            follow_obj = Following(follower_user=login_user, following_user=following_user,
+                                   created_by=login_user, created_at=datetime.now())
+            follow_obj.save()
+            messages.success(request, f'You are now following {following_user.username}!')
+
+        return redirect('blog-home')
