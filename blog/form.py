@@ -24,3 +24,10 @@ class CommentForm(forms.Form):
     class Meta:
         model = Comment
         fields = ['comment']
+
+class ReplyForm(forms.Form):
+    reply = forms.CharField(widget=forms.Textarea, max_length=50)
+
+    class Meta:
+        model = Comment
+        fields = ['reply']

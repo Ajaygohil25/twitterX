@@ -8,7 +8,7 @@ from django.template.loader import render_to_string
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 
-from blog.form import MediaForm, CommentForm
+from blog.form import MediaForm, CommentForm, ReplyForm
 from blog.models import Post, Media, Like, Comment
 from users.models import Following
 
@@ -82,9 +82,11 @@ class PostDetailView(DetailView):
         post = self.get_object()
         if self.request.POST:
             context['comment_form'] = CommentForm(self.request.POST)
+            context["reply_form"] = ReplyForm(self.request.POST)
         else:
             context['comment_form'] = CommentForm()
             context["all_comments"] = post.comment_set.all()
+            context["reply_form"] = ReplyForm(self.request.POST)
 
         return context
 
@@ -241,6 +243,24 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect('blog-detail', pk=comment.post.id)
 
 
+class CommentReplyView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        comment = get_object_or_404(Comment, id=kwargs["pk"])
+        reply_text = request.POST.get('reply')
+
+        if reply_text:
+            comment.reply = reply_text
+            comment.replied_by = request.user
+            comment.save()
+            messages.success(request, f'Replied successfully!')
+
+        html = render_to_string("partials/reply_button.html",
+                                {
+                                    "comment": comment,
+                                    "reply_form": ReplyForm(),
+                                }, request=request)
+
+        return HttpResponse(html)
 
 def about(request):
     return render(request, 'blog/about.html', {"title": "About"})

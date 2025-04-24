@@ -1,33 +1,32 @@
 {% load crispy_forms_filters %}
 <button
-    type="button"
-    class="btn btn-sm text-white open-comment-form"
-    data-post-id="{{ post.id }}"
+        type="button"
+        class="btn btn-sm text-white p-1 open-comment-form"
+        data-post-id="{{ comment.id }}"
 >
-    <i class="bi bi-chat mr-1"></i> Comment
+    <i class="bi bi-reply"></i> Replyyy
 </button>
 
 <div
-        id="comment-popup-{{ post.id }}"
+        id="comment-popup-{{ comment.id }}"
         class="comment-popup-overlay d-none">
     <div class="comment-popup-box">
         <form
-                hx-post="{% url 'blog-comment' post.id %}"
-                hx-target="#comment-section-{{ post.id }}"
+                hx-post="{% url 'comment-reply' comment.id %}"
+                hx-target="#comment-section-{{ comment.id }}"
                 hx-swap="outerHTML"
                 class="comment-form"
         >
-
             {% csrf_token %}
             <div class="form-group">
-                {{ comment_form|crispy }}
+                {{ reply_form| crispy }}
             </div>
             <div class="mt-2 d-flex justify-content-between">
-                <button type="submit" class="btn btn-warning rounded-pill btn-sm">Post Comment</button>
+                <button type="submit" class="btn btn-info rounded-pill btn-sm">Reply </button>
                 <button
                         type="button"
                         class="btn btn-outline-secondary btn-sm cancel-comment"
-                        data-post-id="{{ post.id }}"
+                        data-post-id="{{ comment.id }}"
                 >
                     Cancel
                 </button>
